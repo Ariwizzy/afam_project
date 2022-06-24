@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "257898234756",
+    "project_id": "fnst-24b11",
+    "storage_bucket": "fnst-24b11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:257898234756:android:98199a3abf69caec4d13d1",
+        "android_client_info": {
+          "package_name": "com.ogdev.fsnt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "257898234756-qp0t25fjcsi2thom4aeoklklpa8s1rpq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUXnfejHJi_S6OMuVRpg1QAmYuhMQXNjQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "257898234756-qp0t25fjcsi2thom4aeoklklpa8s1rpq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "257898234756-0u8pec8465j6b7vcmcdvqe7e5a6nccge.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ogdev.fsnt"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
