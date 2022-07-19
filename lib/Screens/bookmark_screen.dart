@@ -1,9 +1,14 @@
 import 'package:afam_project/db/db_helper.dart';
 import 'package:afam_project/model/db_model.dart';
 import 'package:afam_project/widget/news_widget.dart';
+import 'package:applovin_max/applovin_max.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:lottie/lottie.dart';
+import '../constant.dart';
+import '../widget/ads_code.dart';
 class BookMarkScreen extends StatefulWidget {
   const BookMarkScreen({Key key}) : super(key: key);
 
@@ -12,6 +17,18 @@ class BookMarkScreen extends StatefulWidget {
 }
 
 class _BookMarkScreenState extends State<BookMarkScreen> {
+  BannerAd bannerAd;
+  @override
+  void initState() {
+    AppLovinMAX.showBanner(MaxCode().bannerAdUnitId);
+    ads();
+    super.initState();
+  }
+  @override
+  void dispose() {
+    AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +46,28 @@ class _BookMarkScreenState extends State<BookMarkScreen> {
         future: DatabaseHelper().fetchSavedQuotes(),
         builder: (context, snapshot) {
           if(snapshot.hasData){
-            return snapshot.data.isEmpty?Center(child: Text("You don't have any bookmark yet",style: GoogleFonts.ptSans(letterSpacing: 0.5,fontSize: 16)),):SingleChildScrollView(
+            return snapshot.data.isEmpty?
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Lottie.asset(
+                  'images/notFound.json',
+                  width: MediaQuery.of(context).size.width *0.9,
+                  height: 230,
+                  fit: BoxFit.fill,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text("You don't have any bookmark yet, you can easily add news you want to read later to your bookmark ",style: GoogleFonts.ptSerif(
+                    fontSize: 16,
+                    letterSpacing: 0.5,
+                    color: Colors.grey[800]
+                  ),textAlign: TextAlign.center),
+                ),
+                Container(),
+              ],
+            ):
+            SingleChildScrollView(
               child: Column(
                 children: [
                   ListView.builder(
@@ -80,7 +118,19 @@ class _BookMarkScreenState extends State<BookMarkScreen> {
             child: CircularProgressIndicator(),
           );
         }),
+        bottomNavigationBar: SizedBox(
+          height: 80,
+          child: AdWidget(ad: bannerAd)),
       );
+  }
+  void ads(){
+    bannerAd = BannerAd(
+      adUnitId: AdsCode().banner,
+      size: AdSize.banner,
+      request: AdRequest(keywords: Constant().adRequest),
+      listener: BannerAdListener(onAdClosed: (ad) => ad.dispose()),
+    );
+    bannerAd.load();
   }
 }
 

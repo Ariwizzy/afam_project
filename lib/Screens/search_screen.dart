@@ -3,11 +3,13 @@ import 'package:afam_project/Screens/news_details.dart';
 import 'package:afam_project/constant.dart';
 import 'package:afam_project/model/news_model.dart'as news;
 import 'package:afam_project/model/search_modell.dart';
+import 'package:afam_project/widget/no_internet.dart';
 import 'package:html/parser.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:reading_time/reading_time.dart';
 class SearchScreen extends StatefulWidget {
   final String keyword;
@@ -36,10 +38,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  SizedBox(
-          height: 40,
-          child: Image.asset("images/fnst.png"),
-        ),
+        title: const Text("Search")
       ),
       body: isLoading? Constant().spinKit:Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -92,17 +91,24 @@ class _SearchScreenState extends State<SearchScreen> {
                             )),
                       ),
                     ),
-                    snapshot.data.isEmpty?Container(
+                    snapshot.data.isEmpty?SizedBox(
                       height: MediaQuery.of(context).size.height *0.8,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Image.asset('images/empty.png',height: 150,),
-                          Text("No data from our database match your keyword",style: GoogleFonts.ptSerif(
+                          Lottie.asset(
+                            'images/opps.json',
+                            width: MediaQuery.of(context).size.width *0.9,
+                            height: 270,
+                            fit: BoxFit.fill,
+                          ),
+                          Text("No data from our database match your \n \"keyword\"",style: GoogleFonts.ptSerif(
                             letterSpacing: 0.5,
+                            fontSize: 16.5
                           ),
                             textAlign: TextAlign.center,
                           ),
+                          Container(),
                         ],
                       ),
                     ): ListView.builder(
@@ -152,7 +158,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               );
             }else if(snapshot.hasError){
-              return Center(child: Text(snapshot.error.toString()),);
+              return  NoInternet(onTap: (){
+                setState(() {
+
+                });
+              },);
             }
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,

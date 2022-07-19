@@ -18,9 +18,9 @@ class APi{
   Future<List<SearchModel>> search({String data}) async{
     final String uri = "https://www.newsbtc.com/wp-json/wp/v2/search?search=$data&per_page=30&page=1";
     var res = await http.get(Uri.parse(uri));
-    List jsonResponse = json.decode(res.body);
-    List b = jsonResponse.map((jb) =>  SearchModel.fromJson(jb)).toList();
-    return b;
+      List jsonResponse = json.decode(res.body);
+      List b = jsonResponse.map((jb) =>  SearchModel.fromJson(jb)).toList();
+      return b;
   }
   Future<NewsModel> newsSearchDetails({String id})async{
     final String uri = "https://www.newsbtc.com/wp-json/wp/v2/posts/$id";

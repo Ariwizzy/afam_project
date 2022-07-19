@@ -1,10 +1,14 @@
 import 'package:afam_project/constant.dart';
 import 'package:afam_project/model/db_model.dart';
+import 'package:applovin_max/applovin_max.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../db/db_helper.dart';
+import '../widget/ads_code.dart';
 
 class NewsDetails extends StatefulWidget {
   final String imageUrl, tittle, content, dateTime, minsRead;
@@ -25,10 +29,13 @@ class NewsDetails extends StatefulWidget {
 class _NewsDetailsState extends State<NewsDetails> {
   var dbHelper;
   List<DbModel> dbModel;
+  BannerAd bannerAd;
   bool checkId = false;
   String elementId;
   @override
   void initState() {
+    AppLovinMAX.showBanner(MaxCode().bannerAdUnitId);
+    ads();
     dbHelper = DatabaseHelper();
     DatabaseHelper().fetchSavedQuotes().then((value) {
       dbModel = value;
@@ -43,13 +50,18 @@ class _NewsDetailsState extends State<NewsDetails> {
     });
     super.initState();
   }
-
+  @override
+  void dispose() {
+    AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     print(checkId);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        centerTitle: true,
         title: SizedBox(
           height: 40,
           child: Image.asset("images/fnst.png"),
@@ -58,8 +70,7 @@ class _NewsDetailsState extends State<NewsDetails> {
           GestureDetector(
               onTap: () {
                 if(checkId){
-                  DatabaseHelper()
-                      .deleteQuoteFromFavorite(widget.dbID)
+                  DatabaseHelper().deleteQuoteFromFavorite(widget.dbID)
                       .then((value) {
                     setState(() {
                       checkId =!checkId;
@@ -98,7 +109,7 @@ class _NewsDetailsState extends State<NewsDetails> {
       body: SingleChildScrollView(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -115,9 +126,13 @@ class _NewsDetailsState extends State<NewsDetails> {
                   height: 350,
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        widget.imageUrl,
+                      child: CachedNetworkImage(
                         fit: BoxFit.cover,
+                        imageUrl:  widget.imageUrl,
+                        placeholder: (context, url) => Container(
+                            height: 10,
+                            child: Constant().spinKit),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       )),
                 ),
                 SizedBox(height: 5,),
@@ -175,6 +190,9 @@ class _NewsDetailsState extends State<NewsDetails> {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+          height: 80,
+          child: AdWidget(ad: bannerAd)),
     );
   }
   void toast({String message}){
@@ -185,5 +203,14 @@ class _NewsDetailsState extends State<NewsDetails> {
         backgroundColor: const Color(0xff3A4191),
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+  void ads(){
+    bannerAd = BannerAd(
+      adUnitId: AdsCode().banner,
+      size: AdSize.banner,
+      request: AdRequest(keywords: Constant().adRequest),
+      listener: BannerAdListener(onAdClosed: (ad) => ad.dispose()),
+    );
+    bannerAd.load();
   }
 }

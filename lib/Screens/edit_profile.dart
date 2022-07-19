@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../constant.dart';
 import '../model/provider.dart';
+import '../widget/pop_over.dart';
 class EditProfile extends StatefulWidget {
   const EditProfile({Key key}) : super(key: key);
 
@@ -31,6 +32,7 @@ class _EditProfileState extends State<EditProfile> {
   String errorMessage = "";
   @override
   Widget build(BuildContext context) {
+    final bool btnState = Provider.of<FirstProvider>(context, ).forgotPasswordBtn;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile"),
@@ -71,7 +73,11 @@ class _EditProfileState extends State<EditProfile> {
                 keyboardType: TextInputType.emailAddress,
                 maxLines: null,
                 decoration: Constant.qTextDecoration.copyWith(
-                  suffixIcon: const Icon(Icons.report_gmailerrorred_outlined),
+                  suffixIcon: GestureDetector(
+                      onTap: (){
+                        Constant().toast(message: "Email can't be edited");
+                      },
+                      child: const Icon(Icons.report_gmailerrorred_outlined)),
                   hintText: "Enter email address",
                   // suffixIcon: Icon(Icons.mail_outline)
                 ),
@@ -120,7 +126,39 @@ class _EditProfileState extends State<EditProfile> {
                 },
                 controller: phoneNumberController,
               ),
-              const SizedBox(height: 9,),
+              const SizedBox(height: 5,),
+              GestureDetector(
+                onTap: btnState?(){
+                  Constant().centerToast(message: "sending email");
+                }:(){
+                  Constant().passwordReset(context: context,emailController: emailController,onTap: ()async{
+                   Provider.of<FirstProvider>(context,listen: false).changeForgotPassBtn(state: true);
+                   Navigator.pop(context);
+                    try{
+                      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text).then((value){
+                        Provider.of<FirstProvider>(context,listen: false).changeForgotPassBtn(state: false);
+                        Constant().toast(message: "Resent password email sent successfully",color: Constant().appColor);
+                      });
+                    }on FirebaseAuthException catch(e){
+                      Provider.of<FirstProvider>(context,listen: false).changeForgotPassBtn(state: false);
+                      Constant().toast(message: e.message);
+                    }
+                  },);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 3),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(btnState?"Sending email....":"Change Password",style: GoogleFonts.poppins(
+                        fontSize: 16.5,
+                      )),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4,),
+
               errorMessage.isEmpty?Container():Center(child: Text(errorMessage,style: GoogleFonts.poppins(color: Colors.red),textAlign: TextAlign.center,)),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -168,4 +206,5 @@ class _EditProfileState extends State<EditProfile> {
       )
     );
   }
+
 }

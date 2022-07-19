@@ -1,5 +1,7 @@
+import 'package:afam_project/constant.dart';
 import 'package:afam_project/model/db_model.dart';
 import 'package:afam_project/model/news_model.dart' as news;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,19 +43,27 @@ class NewsWidget extends StatelessWidget {
             child: Row(
               children: [
                 SizedBox(
-                  width:  150,
-                  height: 140,
+                  width:  140,
+                  height: 135,
                   child: ClipRRect(
-                    child: Image.network(
-                      isDb? dbModel[dbIndex].imageUrl:data.yoastHeadJson.schema.graph[5].thumbnailUrl,
+                    child: CachedNetworkImage(
                       fit: BoxFit.cover,
-                      height: 140,
-                      width:  150,
+                      imageUrl:  isDb? dbModel[dbIndex].imageUrl:data.yoastHeadJson.schema.graph[5].thumbnailUrl,
+                      placeholder: (context, url) => Container(
+                          height: 10,
+                          child: Constant().spinKit),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
+                  //   Image.network(
+                  // ,
+                  //     fit: BoxFit.cover,
+                  //     height: 140,
+                  //     width:  150,
+                  //   ),
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                const SizedBox(width: 3,),
+                const SizedBox(width: 4,),
                 Flexible(
                   child: Column(
                     children: [
@@ -75,17 +85,17 @@ class NewsWidget extends StatelessWidget {
                       Row(
                         children: [
                           const  Icon(Icons.calendar_today,color: Color(0xff3A4191),size: 16),
-                          const SizedBox(width: 2,),
+                          const SizedBox(width: 1,),
                           Text(isDb? dbModel[dbIndex].dateTime:formatDate(data.date ?? '', [d, '-', M, '-', yyyy]).toString(),style: GoogleFonts.ptSerif(
                               fontSize: 14,
-                              letterSpacing: 0.5
+                              letterSpacing: 0.2
                           ),),
                           const Spacer(),
                           const  Icon(Icons.access_time_outlined,color: Color(0xff3A4191),size: 17),
-                          const SizedBox(width: 2,),
+                          const SizedBox(width: 1,),
                           Text(isDb? "${dbModel[dbIndex].minsRead} mins read" :"${reader.minutes.toStringAsFixed(0)} mins read",style: GoogleFonts.ptSerif(
-                              letterSpacing: 0.5,
-                              fontSize: 15
+                              letterSpacing: 0.2,
+                              fontSize: 14
                           ),)
                         ],
                       )

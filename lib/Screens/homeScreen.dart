@@ -1,9 +1,11 @@
 import 'package:afam_project/Screens/bookmark_screen.dart';
 import 'package:afam_project/Screens/news.dart';
 import 'package:afam_project/Screens/settings.dart';
+import 'package:applovin_max/applovin_max.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../widget/ads_code.dart';
 import 'home_page.dart';
 import 'news_screen.dart';
 class Homescreen extends StatefulWidget {
@@ -25,6 +27,11 @@ class _HomescreenState extends State<Homescreen> {
      const NewsScreen(),
     const SettingsScreen(),
   ];
+  @override
+  void initState() {
+    initializeBannerAds();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,5 +77,9 @@ class _HomescreenState extends State<Homescreen> {
         onTap: _onItemTapped,
       ),
     );
+  }
+  void initializeBannerAds() {
+    // Banners are automatically sized to 320x50 on phones and 728x90 on tablets
+    AppLovinMAX.createBanner(MaxCode().bannerAdUnitId, AdViewPosition.bottomCenter);
   }
 }

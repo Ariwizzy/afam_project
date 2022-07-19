@@ -1,5 +1,6 @@
 import 'package:afam_project/Screens/search_screen.dart';
 import 'package:afam_project/model/news_model.dart' as n;
+import 'package:afam_project/widget/no_internet.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -206,7 +207,11 @@ class _NewsScreenState extends State<NewsScreen> {
                 ),
               );
             }else if(snapshot.hasError){
-
+              return  NoInternet(onTap: (){
+                setState(() {
+                  APi().newsApi(page: page);
+                });
+              },);
             }
             return Center(child: Constant().spinKit);
           })

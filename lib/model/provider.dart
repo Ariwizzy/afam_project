@@ -14,9 +14,14 @@ class FirstProvider extends ChangeNotifier{
    String phoneNumber;
    String walletAddress;
    List<NewsModel> newsModel;
+   bool forgotPasswordBtn = false;
    int page =1;
   void changeLoading({bool loading}){
     isLoading = loading;
+    notifyListeners();
+  }
+  void changeForgotPassBtn({bool state}){
+    forgotPasswordBtn = state;
     notifyListeners();
   }
   void changePage({int pageb}){

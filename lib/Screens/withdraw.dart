@@ -1,12 +1,14 @@
 import 'package:afam_project/Screens/refer.dart';
 import 'package:afam_project/constant.dart';
 import 'package:afam_project/model/provider.dart';
+import 'package:applovin_max/applovin_max.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../widget/ads_code.dart';
 import '../widget/pop_over.dart';
 class WithDraw extends StatefulWidget {
   final double currentEarning;
@@ -37,6 +39,16 @@ class _WithDrawState extends State<WithDraw> {
   bool isLoading = false;
   String errorMessage = "";
   @override
+  void initState() {
+    AppLovinMAX.showBanner(MaxCode().bannerAdUnitId);
+    super.initState();
+  }
+  @override
+  void dispose() {
+    AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     final String walletAddress = Provider.of<FirstProvider>(context).walletAddress;
     int balEarning = 100 - widget.currentEarning.toInt();
@@ -47,13 +59,12 @@ class _WithDrawState extends State<WithDraw> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Withdraw"),
+        title: const Text("Withdraw"),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               const  SizedBox(height: 5,),
               Image.asset("images/withdraw.png",height: 200,width: double.infinity,),
@@ -94,58 +105,77 @@ class _WithDrawState extends State<WithDraw> {
               const SizedBox(height: 10,),
               Constant().container(),
               const SizedBox(height: 10,),
-              RaisedButton(
-                elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 9,horizontal: 15),
-                  onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>const Refer()));
-                  },child: Text("Refer Now",style: GoogleFonts.ptSerif(
-                  fontSize: 17,
-                  letterSpacing: 0.5,
-                  color: Colors.white
-              )),
-                  color: const Color(0xff3A4191)
+              Row(
+                children: [
+                  Expanded(
+                    child: RaisedButton(
+                      elevation: 1,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+                        onPressed: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>const Refer()));
+                        },child: Text("Refer Now",style: GoogleFonts.ptSerif(
+                        fontSize: 17,
+                        letterSpacing: 0.5,
+                        color: Colors.white
+                    )),
+                        color: const Color(0xff3A4191)
+                    ),
+                  ),
+                  const SizedBox(width: 6,),
+                  Expanded(
+                    child: RaisedButton(
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 15),
+                        onPressed: (){
+                          if(walletAddress.isNotEmpty){
+                            print("okk");
+                            setState(() {
+                              walletController.text = walletAddress;
+                              _handleFABPressed(userId: userID);
+                            });
+                          }
+                          else if(showButton){
+                            _handleFABPressed(userId: userID);
+                          }
+                          else{
+                            Constant().toast(message: "Earn 100 FSNT to add wallet",color:  const Color(0xff3A4191));
+                          }
+                        },
+                        child: isLoading?const SpinKitFadingCircle(
+                          color: Colors.white,
+                          size: 30.0,
+                        ):Text(walletAddress  == null || walletAddress.isEmpty  ?"Add Wallet Address":"Update Address",style: GoogleFonts.ptSerif(
+                            fontSize: 17,
+                            letterSpacing: 0.5,
+                            color: Colors.white
+                        )),
+                        color:  showButton ? const Color(0xff3A4191) : Colors.grey
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15),
-                width: double.infinity,
-                child: RaisedButton(
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
-                  padding: const EdgeInsets.symmetric(vertical: 15,),
-                  onPressed: (){
-                    if(walletAddress.isNotEmpty){
-                      print("okk");
-                      setState(() {
-                        walletController.text = walletAddress;
-                        _handleFABPressed(userId: userID);
-                      });
-                    }
-                   else if(showButton){
-                      _handleFABPressed(userId: userID);
-                    }
-                   else{
-                      Constant().toast(message: "Earn 100 FNST to add wallet",color:  const Color(0xff3A4191));
-                    }
-                  },
-                  child: isLoading?const SpinKitFadingCircle(
-                    color: Colors.white,
-                    size: 30.0,
-                  ):Text(walletAddress.isEmpty?"Add Wallet Address":"Update Address",style: GoogleFonts.ptSerif(
-                  fontSize: 17,
-                  letterSpacing: 0.5,
-                  color: Colors.white
-                )),
-                  color:  showButton ? const Color(0xff3A4191) : Colors.grey
-                ),
-              )
+              // const Spacer(),
+              // Container(
+              //   margin: const EdgeInsets.symmetric(horizontal: 15),
+              //   width: double.infinity,
+              //   child: RaisedButton(
+              //     elevation: 1,
+              //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(17)),
+              //     padding: const EdgeInsets.symmetric(vertical: 15,),
+              //
+              //
+              //     color:  showButton ? const Color(0xff3A4191) : Colors.grey
+              //   ),
+              // ),
+              // SizedBox(height: 4,),
             ],
           ),
         ),
       ),
     );
+
   }
   void _handleFABPressed({String userId}) {
     showModalBottomSheet<int>(
@@ -228,6 +258,7 @@ class _WithDrawState extends State<WithDraw> {
           ),
         );
       },
+      isScrollControlled: true,
     );
   }
 

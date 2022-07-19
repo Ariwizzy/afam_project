@@ -31,6 +31,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       )),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     String name = Provider.of<FirstProvider>(context).name;
@@ -139,9 +140,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       )),
       onPressed:  () async{
         SharedPreferences localStorage = await SharedPreferences.getInstance();
-        await FirebaseAuth.instance.signOut();
-        localStorage.clear().then((value) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const IntroScreen()));
+        await FirebaseAuth.instance.signOut().then((value) {
+          Provider.of<FirstProvider>(context,listen: false).dispose();
+          localStorage.clear().then((value) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const IntroScreen()));
+          });
         });
       },
     );
