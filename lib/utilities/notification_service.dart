@@ -54,7 +54,7 @@ class LocalNotificationService{
     @required int seconds,
   })async{
     final details = await _notificationDetails();
-    await _localNotificationService.zonedSchedule(id, title, body, tz.TZDateTime.from(DateTime.now().add(Duration(minutes: seconds)), tz.local),details,
+    await _localNotificationService.zonedSchedule(id, title, body, tz.TZDateTime.from(DateTime.now().add(Duration(hours: seconds)), tz.local),details,
     androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     );

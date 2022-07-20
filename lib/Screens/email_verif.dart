@@ -49,15 +49,16 @@ class _EmailVerifState extends State<EmailVerif> {
               repeat: false,
               fit: BoxFit.cover,
             ),
-            Text("a verification email has been sent to your email address ${user.email}, kindly click on the link on the mail to get verified",style: GoogleFonts.ptSans(
+            Text("a verification email has been sent to your email address ${user.email}, kindly click on the link on the mail to get verified",
+              style: GoogleFonts.ptSans(
               fontSize: 15.5,
               letterSpacing: 0
             ),
             textAlign: TextAlign.center,
             ),
             // Text("user.email"),
-            const Spacer(),
             Text("NB: Kindly check your spam before requesting a resend",style: GoogleFonts.ptSerif()),
+            const Spacer(),
             const SizedBox(height: 3,),
             Row(
               children: [

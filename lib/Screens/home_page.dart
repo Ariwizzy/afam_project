@@ -35,7 +35,6 @@ class _HomePageState extends State<HomePage> {
   LocalNotificationService service;
   bool uploadLoading = false;
   bool admobAdsFailToLoad = false;
-
   @override
   void initState() {
     _fetchUser();
@@ -79,13 +78,29 @@ class _HomePageState extends State<HomePage> {
   double amount;
   @override
   Widget build(BuildContext context) {
-    print("yo this itz ${DateTime.now().millisecondsSinceEpoch + 1000 * 20}");
     isMaxAdLoaded ? null: initializeRewardedAds();
     // if(!isRewardLoaded){
     //   initializeRewardedAds();
     // }
     final  String name = Provider.of<FirstProvider>(context).name;
-    amount =Provider.of<FirstProvider>(context).amount;
+    final  Timestamp lastAdViewTime = Provider.of<FirstProvider>(context).lastAdViewTime??Timestamp.now();
+    amount = Provider.of<FirstProvider>(context).amount;
+    print("yo this itz ${DateTime.fromMicrosecondsSinceEpoch(lastAdViewTime.microsecondsSinceEpoch)}");
+    // if(DateTime.now().isAfter(DateTime.fromMicrosecondsSinceEpoch(lastAdViewTime.microsecondsSinceEpoch))){
+    //   print("ohh yea we got it");
+    // }
+    DateTime now = DateTime.now();
+    DateTime lastDailyCheck = DateTime.fromMicrosecondsSinceEpoch(lastAdViewTime.microsecondsSinceEpoch)??DateTime.now();
+    if (now.isAfter(lastDailyCheck) && (lastDailyCheck.day != now.day || now.difference(lastDailyCheck).inHours > 24)) {
+      print('After');
+      setState(() {
+        isRewardShow = false;
+      });
+    }else{
+      setState(() {
+        isRewardShow = true;
+      });
+    }
     return Scaffold(
       body: isLoading ?Center(child: Constant().spinKit,):SafeArea(
         child: SingleChildScrollView(
@@ -181,7 +196,7 @@ class _HomePageState extends State<HomePage> {
                              RaisedButton(
                                   onPressed: isRewardShow?(){
                                     Fluttertoast.showToast(
-                                        msg: "Today Task is completed check back tomorrow",
+                                        msg: "Today Task is completed check back later",
                                         toastLength: Toast.LENGTH_SHORT,
                                         gravity: ToastGravity.BOTTOM,
                                         timeInSecForIosWeb: 1,
@@ -199,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                                             uploadLoading = true;
                                             isRewardShow = true;
                                           });
-                                          await service.showScheduleNotification(seconds: 1,id: 2, title: "Don’t forget to mine FSNT", body: "Your mining session just ended. Come back to keep mining FSNT");
+                                          await service.showScheduleNotification(seconds: 5,id: 2, title: "Don’t forget to mine FSNT", body: "Your mining session just ended. Come back to keep mining FSNT");
                                           uploadData(amount);
                                           print("this reward item ${rewardItem.amount}");
                                         },
@@ -209,6 +224,19 @@ class _HomePageState extends State<HomePage> {
                                       print("Max time");
                                      //showAppLovingAds();
                                       showAd();
+                                    }
+                                    else if(!isMaxAdLoaded &! isRewardShow){
+                                      print("Loading max rewarded");
+                                      initializeRewardedAds();
+                                      Fluttertoast.showToast(
+                                          msg: "Ads Loading....",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: const Color(0xff3A4191),
+                                          textColor: Colors.white,
+                                          fontSize: 14.0
+                                      );
                                     }
                                     else{
                                       Fluttertoast.showToast(
@@ -372,9 +400,10 @@ class _HomePageState extends State<HomePage> {
        await FirebaseFirestore.instance.collection("users").doc(user.uid).get().then((value) {
          itemCount = value.data()["list"]??[];
          id = value.data()["userid"];
-         print(value.data()['referralId']);
+         print("This last time ad view ${value.data()['lastAdView']}");
          Provider.of<FirstProvider>(context,listen: false).changeDetails(referralIdB: value.data()['referralId']??'',userIdB :value.data()['userid'],mineIdb: itemCount.isEmpty ? 0 : value.data()['list'][itemCount.length-1]["mineId"],amountb: value.data()['amount']??0.0,nameB: value.data()["name"]??'',emailB: value.data()["email"]??'',phoneB: value.data()["number"]??'');
          Provider.of<FirstProvider>(context,listen: false).changeWallet(walletA: value.data()['walletAddress']??'');
+         Provider.of<FirstProvider>(context,listen: false).changeLastAdViewTime(lastAdViewTimeb: value.data()['lastAdView']);
        });
      } catch(e){
        print(e);
@@ -393,12 +422,12 @@ class _HomePageState extends State<HomePage> {
     final String name = Provider.of<FirstProvider>(context,listen: false).name;
     double addAmount = 0.8;
     DateTime now = DateTime.now();
-    String formattedTime = DateFormat.Hm().format(now);
+    // String formattedTime = DateFormat.Hm().format(now);
     double addRefAmount = 0.2;
     var datetime = formatDate(DateTime.now() ?? '', [d, '-', M, '-', yyyy]).toString();
     var user = FirebaseAuth.instance.currentUser;
     Map<String, dynamic> user1 = {"mineId": Provider.of<FirstProvider>(context,listen: false).mineID + 1 ,"date": datetime, "amount": 0.80,"tittle":"Mining Successful"};
-    FirebaseFirestore.instance.collection("users").doc(user.uid).update({'list': FieldValue.arrayUnion([user1]),"amount":amount + addAmount,"mineId": 1, "lastAdView":formattedTime}).then((value) {
+    FirebaseFirestore.instance.collection("users").doc(user.uid).update({'list': FieldValue.arrayUnion([user1]),"amount":amount + addAmount,"mineId": 1, "lastAdView":now}).then((value) {
      if(referralId.isEmpty || referralId == null || referralId ==''){
         _fetchUser();
      }else{

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'news_model.dart';
@@ -7,6 +8,7 @@ class FirstProvider extends ChangeNotifier{
    bool showSearch = false;
    String userId ='';
    String referralId ='';
+   Timestamp lastAdViewTime;
    String name;
    String email;
    double amount =0.0;
@@ -30,6 +32,10 @@ class FirstProvider extends ChangeNotifier{
   }
   void changeWallet({String walletA}){
     walletAddress = walletA;
+    notifyListeners();
+  }
+  void changeLastAdViewTime({Timestamp lastAdViewTimeb}){
+    lastAdViewTime =lastAdViewTimeb;
     notifyListeners();
   }
   void changeDetails({String nameB,String emailB, String phoneB,double amountb,int mineIdb,String userIdB,referralIdB}){

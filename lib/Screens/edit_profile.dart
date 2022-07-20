@@ -188,7 +188,7 @@ class _EditProfileState extends State<EditProfile> {
                            Provider.of<FirstProvider>(context,listen: false).changeDetails(userIdB :value.data()['userid'].toString().substring(0,6),mineIdb: itemCount.isEmpty ? 0 : value.data()['list'][itemCount.length-1]["mineId"],amountb: value.data()['amount']??0.0,nameB: value.data()["name"]??'',emailB: value.data()["email"]??'',phoneB: value.data()["number"]??'');
                          });
                          Constant().toast(message: "Updated Successfully",color: const Color(0xff3A4191));
-                         Navigator.pop(context);
+                         Future.delayed(const Duration(seconds: 1)).then((value) => Navigator.of(context).pop());
                        });
                      }catch (e){
                        setState(() {

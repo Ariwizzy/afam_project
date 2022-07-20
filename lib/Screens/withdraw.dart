@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import '../widget/ads_code.dart';
@@ -38,9 +39,10 @@ class _WithDrawState extends State<WithDraw> {
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
   String errorMessage = "";
+  BannerAd bannerAd;
   @override
   void initState() {
-    AppLovinMAX.showBanner(MaxCode().bannerAdUnitId);
+    ads();
     super.initState();
   }
   @override
@@ -48,8 +50,10 @@ class _WithDrawState extends State<WithDraw> {
     AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
     super.dispose();
   }
+  bool admobError =false;
   @override
   Widget build(BuildContext context) {
+    admobError? AppLovinMAX.showBanner(MaxCode().bannerAdUnitId):AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
     final String walletAddress = Provider.of<FirstProvider>(context).walletAddress;
     int balEarning = 100 - widget.currentEarning.toInt();
     final String userID = Provider.of<FirstProvider>(context).userId;
@@ -261,5 +265,21 @@ class _WithDrawState extends State<WithDraw> {
       isScrollControlled: true,
     );
   }
-
+  void ads(){
+    bannerAd = BannerAd(
+      adUnitId: AdsCode().banner,
+      size: AdSize.banner,
+      request: AdRequest(keywords: Constant().adRequest),
+      listener: BannerAdListener(
+          onAdClosed: (ad) => ad.dispose(),
+          onAdFailedToLoad: (ad,error){
+            print("Reason why ads banner Ads did not load $error");
+            setState(() {
+              admobError = true;
+            });
+          }
+      ),
+    );
+    bannerAd.load();
+  }
 }

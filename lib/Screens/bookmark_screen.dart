@@ -20,17 +20,20 @@ class _BookMarkScreenState extends State<BookMarkScreen> {
   BannerAd bannerAd;
   @override
   void initState() {
-    AppLovinMAX.showBanner(MaxCode().bannerAdUnitId);
+
     ads();
     super.initState();
   }
   @override
-  void dispose() {
+  void dispose(){
     AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
     super.dispose();
   }
+  bool admobError = false;
   @override
   Widget build(BuildContext context) {
+    print(admobError);
+    admobError? AppLovinMAX.showBanner(MaxCode().bannerAdUnitId):AppLovinMAX.hideBanner(MaxCode().bannerAdUnitId);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -128,7 +131,15 @@ class _BookMarkScreenState extends State<BookMarkScreen> {
       adUnitId: AdsCode().banner,
       size: AdSize.banner,
       request: AdRequest(keywords: Constant().adRequest),
-      listener: BannerAdListener(onAdClosed: (ad) => ad.dispose()),
+      listener: BannerAdListener(
+          onAdClosed: (ad) => ad.dispose(),
+        onAdFailedToLoad: (ad,error){
+            print("Reason why ads banner Ads did not load $error");
+            setState(() {
+              admobError = true;
+            });
+        }
+      ),
     );
     bannerAd.load();
   }
